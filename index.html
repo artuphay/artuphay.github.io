@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Muhammad Ari Syahputra Sandan — Portfolio</title>
+<meta name="description" content="Partnerships & Payments Integration Lead. 669 billers, 40.7M transactions, US$2B+ payment volume.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: left-aligned single column, ledger-style metric strip, case studies as numbered rows, timeline as a two-column ledger. */
+:root{
+  --bg:#f5f7f8;
+  --surface:#ffffff;
+  --ink:#14202b;
+  --muted:#556270;
+  --line:#dbe2e7;
+  --accent:#0b6e8a;
+  --accent-soft:#e3f1f5;
+  --display:"Sora", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e161d; --surface:#15212b; --ink:#e7eef3; --muted:#9db0bf; --line:#253542;
+    --accent:#5cc3df; --accent-soft:#16323d; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e161d; --surface:#15212b; --ink:#e7eef3; --muted:#9db0bf; --line:#253542;
+  --accent:#5cc3df; --accent-soft:#16323d; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h2{font-size:1.5rem;font-weight:600}
+h3{font-size:1.1rem;font-weight:600}
+p{margin:0}
+.label{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* Header */
+header{padding:64px 0 40px;border-bottom:1px solid var(--line)}
+.hero{display:grid;gap:20px;max-width:780px}
+h1{font-size:clamp(2rem,4.6vw,3rem);font-weight:700;letter-spacing:-.01em}
+.role{font-family:var(--display);font-size:1.15rem;color:var(--accent);font-weight:500}
+.lede{color:var(--muted);max-width:65ch}
+.contact{display:flex;flex-wrap:wrap;gap:10px 24px;font-size:.95rem}
+.contact span{color:var(--muted)}
+
+/* Metrics */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);background:var(--surface);border-radius:10px;margin:40px 0 0;overflow:hidden}
+.metric{padding:22px 22px 20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;gap:4px}
+.metric:nth-child(3n){border-right:0}
+.metric:nth-last-child(-n+3){border-bottom:0}
+.num{font-family:var(--display);font-size:1.9rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
+.num small{font-size:1rem;color:var(--muted);font-weight:500}
+.metric p{color:var(--muted);font-size:.92rem;line-height:1.45}
+
+section{padding:56px 0;border-bottom:1px solid var(--line)}
+.sec-head{display:grid;gap:6px;margin-bottom:28px}
+
+/* Case studies */
+.cases{display:grid;gap:16px}
+.case{display:grid;grid-template-columns:56px 1fr;gap:20px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px}
+.case .idx{font-family:var(--mono);color:var(--accent);font-size:.9rem;padding-top:3px}
+.case-body{display:grid;gap:12px}
+.case-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.case-grid div{display:grid;gap:4px}
+.case-grid p{font-size:.95rem}
+.result{display:inline-block;background:var(--accent-soft);color:var(--ink);padding:6px 12px;border-radius:6px;font-size:.92rem;font-weight:500}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:var(--mono);font-size:.75rem;border:1px solid var(--line);border-radius:4px;padding:2px 8px;color:var(--muted)}
+
+/* Process */
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.step{padding:18px 16px;border-right:1px solid var(--line);display:grid;gap:6px;align-content:start}
+.step:last-child{border-right:0}
+.step b{font-family:var(--display);font-weight:600;font-size:.98rem}
+.step p{color:var(--muted);font-size:.88rem;line-height:1.45}
+
+/* Timeline */
+.timeline{display:grid;gap:0}
+.job{display:grid;grid-template-columns:200px 1fr;gap:24px;padding:20px 0;border-top:1px solid var(--line)}
+.job:first-child{border-top:0;padding-top:0}
+.when{font-family:var(--mono);font-size:.82rem;color:var(--muted);padding-top:4px;font-variant-numeric:tabular-nums}
+.job-body{display:grid;gap:6px}
+.job-body .org{color:var(--muted);font-size:.95rem}
+.job-body ul{margin:4px 0 0;padding-left:18px;color:var(--ink)}
+.job-body li{margin:2px 0;font-size:.95rem}
+
+/* Skills */
+.skills{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.skill{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:10px;align-content:start}
+.skill ul{margin:0;padding-left:18px}
+.skill li{font-size:.95rem;margin:3px 0}
+
+footer{padding:40px 0 56px;color:var(--muted);font-size:.9rem}
+.foot{display:flex;flex-wrap:wrap;gap:12px 32px;justify-content:space-between}
+
+@media (max-width:860px){
+  .steps{grid-template-columns:repeat(3,1fr)}
+  .step:nth-child(3){border-right:0}
+  .step:nth-child(-n+3){border-bottom:1px solid var(--line)}
+  .skills{grid-template-columns:1fr}
+  .case-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  header{padding-top:40px}
+  .metrics{grid-template-columns:1fr 1fr}
+  .metric:nth-child(3n){border-right:1px solid var(--line)}
+  .metric:nth-child(2n){border-right:0}
+  .metric:nth-last-child(-n+3){border-bottom:1px solid var(--line)}
+  .metric:nth-last-child(-n+2){border-bottom:0}
+  .case{grid-template-columns:1fr;gap:8px}
+  .job{grid-template-columns:1fr;gap:4px}
+  .steps{grid-template-columns:1fr 1fr}
+  .step{border-right:1px solid var(--line)!important;border-bottom:1px solid var(--line)}
+  .step:nth-child(2n){border-right:0!important}
+  .step:nth-last-child(-n+2){border-bottom:0}
+}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="hero">
+      <p class="label">Portfolio · Jakarta, Indonesia</p>
+      <h1>Muhammad Ari Syahputra Sandan</h1>
+      <p class="role">Partnerships &amp; Payments Integration Lead</p>
+      <p class="lede">I run payment partnerships end to end at PT Pos Indonesia, from commercial negotiation and legal alignment to API integration, UAT and launch. A Computer Science background and three years as a web developer let me sit between business owners and engineering teams and get integrations shipped. I am looking for a Project Manager or Technical Program Manager role in fintech, payments or platform integrations.</p>
+      <div class="contact">
+        <a href="mailto:artuphay@gmail.com">artuphay@gmail.com</a>
+        <span>+62 812 5054 405</span>
+        <a href="https://www.linkedin.com/in/muhammad-ari-syahputra-sandan-b8644285/">LinkedIn</a>
+        <a href="https://github.com/artuphay">github.com/artuphay</a>
+      </div>
+    </div>
+
+    <div class="metrics" aria-label="Key figures, 2026 year to date">
+      <div class="metric"><span class="num">669</span><p>national billers in my portfolio: government, utilities, social security, insurance, multifinance, telecom</p></div>
+      <div class="metric"><span class="num">40.7M</span><p>transactions processed through the portfolio, 2026 YTD</p></div>
+      <div class="metric"><span class="num">US$2B<small>+</small></span><p>payment volume, 2026 YTD</p></div>
+      <div class="metric"><span class="num">47</span><p>new billers and products onboarded in 2026</p></div>
+      <div class="metric"><span class="num">90 → 25<small> days</small></span><p>invoice cycle time after process redesign</p></div>
+      <div class="metric"><span class="num">−99%</span><p>billing and reconciliation disputes, at best</p></div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="work">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="label">Selected work</p>
+      <h2>Case studies</h2>
+    </div>
+    <div class="cases">
+
+      <article class="case">
+        <span class="idx">01</span>
+        <div class="case-body">
+          <h3>Scaling the national biller network at PT Pos Indonesia</h3>
+          <div class="case-grid">
+            <div><p class="label">Context</p><p>Pos Indonesia collects bill payments for hundreds of institutions through its branch and digital channels. Every new biller needs a commercial deal, a contract and a working integration.</p></div>
+            <div><p class="label">What I did</p><p>Led acquisition and onboarding end to end: opportunity sizing, fee negotiation, business model, legal alignment, integration requirements, testing and UAT with partner and internal engineering, then launch and tracking.</p></div>
+            <div><p class="label">Partners</p><p>Regional government tax, water utilities, microinsurance, mobile data top-up, plus key national accounts: PLN, BPJS, the national tax payment system and Telkom.</p></div>
+          </div>
+          <span class="result">47 new billers and products live in 2026; portfolio of 669 billers, 40.7M transactions, US$2B+ volume</span>
+          <div class="tags"><span class="tag">Partnerships</span><span class="tag">API integration</span><span class="tag">UAT</span><span class="tag">Commercial negotiation</span></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <span class="idx">02</span>
+        <div class="case-body">
+          <h3>Cutting the biller invoice cycle from 90 to 25 days</h3>
+          <div class="case-grid">
+            <div><p class="label">Problem</p><p>Invoicing billers for collection fees took around three months, which delayed revenue recognition and cash.</p></div>
+            <div><p class="label">What I did</p><p>Mapped the end-to-end process across Finance, Operations and Legal, removed hand-off delays, and put tighter monitoring and cross-functional follow-up in place.</p></div>
+            <div><p class="label">Why it matters</p><p>Faster invoicing shortens the cash cycle on a portfolio worth over US$2B in annual volume.</p></div>
+          </div>
+          <span class="result">Invoice cycle time reduced from 90 to 25 days</span>
+          <div class="tags"><span class="tag">Process redesign</span><span class="tag">Finance ops</span><span class="tag">Stakeholder management</span></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <span class="idx">03</span>
+        <div class="case-body">
+          <h3>Reconciliation controls that removed billing disputes</h3>
+          <div class="case-grid">
+            <div><p class="label">Problem</p><p>Mismatches between partner and internal transaction records were causing recurring billing and reconciliation disputes.</p></div>
+            <div><p class="label">What I did</p><p>Introduced stronger validation controls, documentation standards for each integration, and routine monitoring of reconciliation results.</p></div>
+            <div><p class="label">Outcome</p><p>Fewer escalations with partners and less manual correction work for Finance.</p></div>
+          </div>
+          <span class="result">Billing and reconciliation disputes reduced by up to 99%</span>
+          <div class="tags"><span class="tag">Reconciliation</span><span class="tag">Controls</span><span class="tag">Documentation</span></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <span class="idx">04</span>
+        <div class="case-body">
+          <h3>Warehouse Management System rollout</h3>
+          <div class="case-grid">
+            <div><p class="label">Context</p><p>Pos Indonesia was implementing a new Warehouse Management System for its logistics operations.</p></div>
+            <div><p class="label">What I did</p><p>As Junior Analyst in Bandung, translated operational requirements into system requirements and supported unit testing, UAT and user adoption.</p></div>
+            <div><p class="label">Skills used</p><p>Requirements analysis, test planning, user training.</p></div>
+          </div>
+          <div class="tags"><span class="tag">Requirements</span><span class="tag">UAT</span><span class="tag">Logistics systems</span></div>
+        </div>
+      </article>
+
+      <article class="case">
+        <span class="idx">05</span>
+        <div class="case-body">
+          <h3>Cafe management and QR table ordering system</h3>
+          <div class="case-grid">
+            <div><p class="label">What it is</p><p>A full-stack side project: customers order from a QR code at the table, the cashier works a real-time POS that prints thermal receipts from the browser, and the owner gets a sales and menu dashboard.</p></div>
+            <div><p class="label">Stack</p><p>Next.js (App Router), TypeScript, Tailwind CSS, PostgreSQL on Neon, Prisma ORM, deployed on Vercel.</p></div>
+            <div><p class="label">Code</p><p><a href="https://github.com/artuphay/cafe-app">github.com/artuphay/cafe-app</a></p></div>
+          </div>
+          <div class="tags"><span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">PostgreSQL</span><span class="tag">Prisma</span></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section id="approach">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="label">How I deliver an integration</p>
+      <h2>From first meeting to go-live</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="label">1</span><b>Opportunity</b><p>Size the partner's volume and fit with our channels.</p></div>
+      <div class="step"><span class="label">2</span><b>Commercials</b><p>Negotiate fees, SLA and the business model.</p></div>
+      <div class="step"><span class="label">3</span><b>Legal</b><p>Align the agreement with Legal and the partner.</p></div>
+      <div class="step"><span class="label">4</span><b>Integration</b><p>Turn needs into API and reconciliation requirements.</p></div>
+      <div class="step"><span class="label">5</span><b>Testing &amp; UAT</b><p>Run test cases with both engineering teams.</p></div>
+      <div class="step"><span class="label">6</span><b>Launch &amp; track</b><p>Go live, then monitor volume, disputes and invoices.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="label">Experience</p>
+      <h2>8+ years across web, logistics, operations and payments</h2>
+    </div>
+    <div class="timeline">
+      <div class="job"><span class="when">Jun 2025 – now</span><div class="job-body"><h3>Acquisition &amp; Partnership Biller Manager</h3><p class="org">PT Pos Indonesia (Persero) · Jakarta</p><ul><li>Portfolio of 669 billers; 40.7M transactions and US$2B+ volume in 2026 YTD</li><li>47 new billers and products onboarded in 2026</li><li>Invoice cycle 90 → 25 days; disputes down by up to 99%</li></ul></div></div>
+      <div class="job"><span class="when">Apr 2026 – Jul 2026</span><div class="job-body"><h3>Indonesian Hajj Cargo Officer (seasonal)</h3><p class="org">PT Pos Indonesia (Persero) · Saudi Arabia</p><ul><li>End-to-end cargo delivery of pilgrims' belongings to Indonesia in a team of 20+, including cross-border documentation and compliance</li></ul></div></div>
+      <div class="job"><span class="when">Feb 2024 – May 2025</span><div class="job-body"><h3>Branch Manager</h3><p class="org">PT Pos Indonesia (Persero) · Tabanan, Bali</p><ul><li>Owned branch P&amp;L across logistics, retail and financial services; grew corporate customers and local partnerships</li></ul></div></div>
+      <div class="job"><span class="when">Oct 2022 – Jan 2024</span><div class="job-body"><h3>Branch Manager</h3><p class="org">PT Pos Indonesia (Persero) · Sibolga, North Sumatera</p><ul><li>Led a cross-functional branch team to revenue and profitability targets</li></ul></div></div>
+      <div class="job"><span class="when">Oct 2020 – Sep 2022</span><div class="job-body"><h3>Logistics Supervisor, then Retail Sales Supervisor</h3><p class="org">PT Pos Indonesia (Persero) · Binjai, North Sumatera</p><ul><li>Ran courier and logistics operations to SLA; managed retail sales across courier, financial services, digital channels and marketplaces</li></ul></div></div>
+      <div class="job"><span class="when">Jul 2020 – Oct 2020</span><div class="job-body"><h3>Junior Analyst</h3><p class="org">PT Pos Indonesia (Persero) · Bandung</p><ul><li>Warehouse Management System requirements, testing and UAT</li></ul></div></div>
+      <div class="job"><span class="when">Feb 2018 – Jul 2020</span><div class="job-body"><h3>Web Developer</h3><p class="org">PT Lunata Teknokindo Group · Medan</p><ul><li>Built and maintained web applications: APIs, databases, deployment, client guides and demos (Node.js, TypeScript, PostgreSQL)</li></ul></div></div>
+      <div class="job"><span class="when">Mar 2015 – Oct 2015</span><div class="job-body"><h3>Android Developer (freelance)</h3><p class="org">Telkomsel · Medan</p><ul><li>Built Android applications in Java and integrated them with backend services</li></ul></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="label">Skills &amp; education</p>
+      <h2>What I bring to a payments team</h2>
+    </div>
+    <div class="skills">
+      <div class="skill"><h3>Delivery</h3><ul><li>Partner integration programs</li><li>Requirements and UAT</li><li>Process redesign</li><li>Cross-functional coordination</li><li>Performance monitoring</li></ul></div>
+      <div class="skill"><h3>Business</h3><ul><li>Biller and merchant acquisition</li><li>Fee and commercial negotiation</li><li>P&amp;L ownership</li><li>Billing and reconciliation</li><li>Key account management</li></ul></div>
+      <div class="skill"><h3>Technical &amp; education</h3><ul><li>B.Sc. Computer Science, Universitas Sumatera Utara (2013–2018); chaired IMILKOM USU in 2017</li><li>Next.js, TypeScript, Node.js, PostgreSQL, Java</li><li>Microsoft Office Specialist: Excel, Word, PowerPoint</li></ul></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>Muhammad Ari Syahputra Sandan · Jakarta, Indonesia</span>
+    <span>artuphay@gmail.com · +62 812 5054 405</span>
+  </div>
+</footer>
+
+</body>
+</html>
