@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRD: Water Bill Payment Integration</title>
+<meta name="description" content="Sample product requirements document for onboarding a water utility biller onto a national payment channel network. Fictional partner.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: document page, metadata table up top, numbered sections, requirement tables with IDs. */
+:root{
+  --bg:#f5f7f8; --surface:#ffffff; --ink:#14202b; --muted:#556270; --line:#dbe2e7; --accent:#0b6e8a; --accent-soft:#e3f1f5; --warn-soft:#fbf0db;
+  --display:"Sora","Segoe UI",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e161d;--surface:#15212b;--ink:#e7eef3;--muted:#9db0bf;--line:#253542;--accent:#5cc3df;--accent-soft:#16323d;--warn-soft:#3a2d12;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e161d;--surface:#15212b;--ink:#e7eef3;--muted:#9db0bf;--line:#253542;--accent:#5cc3df;--accent-soft:#16323d;--warn-soft:#3a2d12;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+a{color:var(--accent);text-underline-offset:3px}
+.doc{max-width:860px;margin:0 auto;padding:36px 20px 64px;display:grid;gap:28px}
+h1,h2,h3{font-family:var(--display);line-height:1.25;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.5rem,3.2vw,2rem)}
+h2{font-size:1.2rem;padding-top:8px;border-top:1px solid var(--line)}
+h3{font-size:1rem}
+p,ul,ol{margin:0}
+ul,ol{padding-left:20px;display:grid;gap:4px}
+.label{font-family:var(--mono);font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.notice{background:var(--warn-soft);border-radius:6px;padding:6px 10px;font-size:.88rem}
+section{display:grid;gap:12px}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.id{font-family:var(--mono);font-size:.82rem;white-space:nowrap;color:var(--accent)}
+.meta td:first-child{color:var(--muted);width:180px}
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:.82rem}
+.flow span{background:var(--accent-soft);border-radius:6px;padding:4px 10px}
+.flow i{color:var(--muted);font-style:normal}
+.moscow{font-family:var(--mono);font-size:.78rem;white-space:nowrap}
+footer{color:var(--muted);font-size:.88rem;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<article class="doc">
+  <header style="display:grid;gap:10px">
+    <p class="label"><a href="../">← artuphay.github.io</a> · Work sample · Product requirements</p>
+    <h1>PRD: Water Bill Payment Integration with PDAM Tirta Contoh</h1>
+    <p class="notice">Sample document. The biller, figures and timeline are fictional and show how I structure a biller onboarding PRD.</p>
+    <div class="tablewrap"><table class="meta"><tbody>
+      <tr><td>Owner</td><td>Biller Partnership Manager</td></tr>
+      <tr><td>Status</td><td>Approved for development · v1.2</td></tr>
+      <tr><td>Stakeholders</td><td>Product, Payment Engineering, Legal, Finance (Settlement), Operations, Customer Care, PDAM Tirta Contoh IT</td></tr>
+      <tr><td>Target go-live</td><td>Week 10 from contract signing</td></tr>
+      <tr><td>Related</td><td><a href="uat.html">UAT test plan</a> · <a href="../simulator/">Biller Integration Simulator</a></td></tr>
+    </tbody></table></div>
+  </header>
+
+  <section>
+    <h2>1. Background and problem</h2>
+    <p>PDAM Tirta Contoh serves about 180,000 household connections. Today customers pay at 6 PDAM cashier offices or through one bank. Queues peak between the 1st and 20th of each month, and about 12% of customers pay late, which costs PDAM collection effort and costs customers a late fee.</p>
+    <p>Our network has more than 4,000 counters and a mobile app in the same regency. Adding PDAM Tirta Contoh as a biller gives customers a closer place to pay and gives us fee income and foot traffic.</p>
+  </section>
+
+  <section>
+    <h2>2. Goals and success metrics</h2>
+    <div class="tablewrap"><table><thead><tr><th>Metric</th><th>Target, 6 months after go-live</th><th>Source</th></tr></thead><tbody>
+      <tr><td>Monthly transactions through our channels</td><td>25,000</td><td>Transaction switch report</td></tr>
+      <tr><td>Payment success rate (rc 00 / all payment requests)</td><td>≥ 99.0%</td><td>Switch logs</td></tr>
+      <tr><td>Daily reconciliation match rate</td><td>≥ 99.9%, exceptions closed within H+1</td><td>Reconciliation tool</td></tr>
+      <tr><td>Invoice issued to biller for collection fees</td><td>Within 25 days of month end</td><td>Finance</td></tr>
+      <tr><td>Customer complaints about double charge</td><td>0 unresolved after 3 working days</td><td>Customer Care tickets</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section>
+    <h2>3. Scope</h2>
+    <h3>In scope</h3>
+    <ul>
+      <li>Postpaid water bill payment at counters (teller app) and in the mobile app.</li>
+      <li>Host-to-host integration: inquiry, payment, advice (status check) and same-day reversal.</li>
+      <li>Daily settlement file exchange and automated reconciliation.</li>
+      <li>Monthly fee invoicing and fund transfer to the biller's account.</li>
+    </ul>
+    <h3>Out of scope for this release</h3>
+    <ul>
+      <li>New connection fees and installation payments.</li>
+      <li>Partial payment of arrears; the customer pays all open periods or none.</li>
+      <li>Auto-debit or recurring payments.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. User flow</h2>
+    <div class="flow"><span>Customer gives customer ID</span><i>→</i><span>Inquiry to biller</span><i>→</i><span>Show name, period, amount, fee</span><i>→</i><span>Customer confirms and pays</span><i>→</i><span>Payment to biller</span><i>→</i><span>Receipt with biller reference</span></div>
+    <p>If the payment response does not arrive within 30 seconds, the channel shows "processing", sends an advice, and prints the receipt only once the biller confirms. The teller can never resend the payment manually.</p>
+  </section>
+
+  <section>
+    <h2>5. Functional requirements</h2>
+    <div class="tablewrap"><table><thead><tr><th>ID</th><th>Requirement</th><th>Priority</th></tr></thead><tbody>
+      <tr><td class="id">FR-01</td><td>The channel sends an inquiry with biller code and customer ID; the biller returns name, period(s), bill amount and an inquiry reference.</td><td class="moscow">Must</td></tr>
+      <tr><td class="id">FR-02</td><td>The payment amount comes from the inquiry response and cannot be edited by the teller or user.</td><td class="moscow">Must</td></tr>
+      <tr><td class="id">FR-03</td><td>Admin fee of Rp2,500 per transaction is shown separately before confirmation and printed on the receipt.</td><td class="moscow">Must</td></tr>
+      <tr><td class="id">FR-04</td><td>Each payment carries a unique transaction ID; the biller rejects duplicates with rc 94.</td><td class="moscow">Must</td></tr>
+      <tr><td class="id">FR-05</td><td>On timeout (no response in 30 s) the system sends up to 3 advices at 30 s intervals before marking the transaction for manual review.</td><td class="moscow">Must</td></tr>
+      <tr><td class="id">FR-06</td><td>Same-day reversal is allowed until 23:00 local time with supervisor approval.</td><td class="moscow">Must</td></tr>
+      <tr><td class="id">FR-07</td><td>Receipt shows biller reference number, customer name, period, amount, fee and timestamp.</td><td class="moscow">Must</td></tr>
+      <tr><td class="id">FR-08</td><td>Customer can pay multiple open periods in one transaction.</td><td class="moscow">Should</td></tr>
+      <tr><td class="id">FR-09</td><td>Mobile app saves the customer ID for the next month.</td><td class="moscow">Could</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section>
+    <h2>6. Non-functional requirements</h2>
+    <div class="tablewrap"><table><thead><tr><th>ID</th><th>Requirement</th></tr></thead><tbody>
+      <tr><td class="id">NFR-01</td><td>Biller host availability ≥ 99.5% per month, excluding a weekly maintenance window agreed in advance.</td></tr>
+      <tr><td class="id">NFR-02</td><td>95th percentile response time ≤ 5 s for inquiry and payment.</td></tr>
+      <tr><td class="id">NFR-03</td><td>All traffic over a private link or TLS 1.2+, with IP whitelisting and message signature.</td></tr>
+      <tr><td class="id">NFR-04</td><td>Transaction logs kept for 5 years; no customer data beyond ID and name stored by the channel.</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section>
+    <h2>7. Settlement and reconciliation</h2>
+    <ul>
+      <li>The biller sends a settlement file by 02:00 for the previous day: transaction ID, amount, status, biller reference.</li>
+      <li>Automated matching on transaction ID, amount and status. Exceptions are routed by type: missing at biller, missing at our side, amount mismatch, status mismatch.</li>
+      <li>Funds are transferred to the biller at H+1 for matched transactions; disputed items are held until resolved.</li>
+      <li>Collection fee invoice is issued monthly, within 25 days of month end, based on matched transactions only.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>8. Commercial and legal</h2>
+    <ul>
+      <li>Fee model: Rp2,500 paid by the customer, of which a share is passed to the biller as agreed in the cooperation agreement.</li>
+      <li>Cooperation agreement (PKS) and technical addendum signed before UAT starts.</li>
+      <li>SLA penalties apply to both sides for settlement delays beyond H+2.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>9. Risks and mitigations</h2>
+    <div class="tablewrap"><table><thead><tr><th>Risk</th><th>Impact</th><th>Mitigation</th></tr></thead><tbody>
+      <tr><td>Biller host is slow at month start</td><td>Timeouts, angry customers, double-charge claims</td><td>Advice flow (FR-05), load test at 3× expected peak during UAT</td></tr>
+      <tr><td>Biller IT team has limited capacity</td><td>Integration delay</td><td>Provide API spec, sandbox and simulator in week 1; weekly checkpoint</td></tr>
+      <tr><td>Fee share not agreed by signing date</td><td>Go-live slips</td><td>Escalate to commercial heads in week 3 with two fee scenarios</td></tr>
+      <tr><td>Wrong amount posted at biller</td><td>Reconciliation disputes</td><td>Amount locked from inquiry (FR-02); daily recon with H+1 closure</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section>
+    <h2>10. Timeline</h2>
+    <div class="tablewrap"><table><thead><tr><th>Week</th><th>Milestone</th><th>Owner</th></tr></thead><tbody>
+      <tr><td>0</td><td>Agreement signed, API spec shared</td><td>Partnership, Legal</td></tr>
+      <tr><td>1–4</td><td>Development on both sides against sandbox</td><td>Engineering, biller IT</td></tr>
+      <tr><td>5–6</td><td>System integration testing</td><td>Engineering</td></tr>
+      <tr><td>7–8</td><td>UAT and reconciliation dry run</td><td>Partnership, Finance, Operations</td></tr>
+      <tr><td>9</td><td>Pilot in 50 counters, teller briefing</td><td>Operations</td></tr>
+      <tr><td>10</td><td>Full launch and announcement</td><td>Partnership, Marketing</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <footer>Prepared by Muhammad Ari Syahputra Sandan as a portfolio work sample. <a href="../">Back to portfolio</a></footer>
+</article>
+</body>
+</html>

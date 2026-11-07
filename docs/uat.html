@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UAT Plan: Water Bill Payment</title>
+<meta name="description" content="Sample user acceptance test plan for a biller payment integration: scenarios, expected results, sign-off criteria. Fictional partner.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+/* Layout: document page; summary tiles, then one test-case table per area, then exit criteria and sign-off. */
+:root{
+  --bg:#f5f7f8; --surface:#ffffff; --ink:#14202b; --muted:#556270; --line:#dbe2e7; --accent:#0b6e8a; --accent-soft:#e3f1f5; --warn-soft:#fbf0db;
+  --ok:#1f7a4d; --ok-soft:#e2f3ea; --bad:#b03a2e; --bad-soft:#f8e4e1;
+  --display:"Sora","Segoe UI",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e161d;--surface:#15212b;--ink:#e7eef3;--muted:#9db0bf;--line:#253542;--accent:#5cc3df;--accent-soft:#16323d;--warn-soft:#3a2d12;--ok:#5fd39a;--ok-soft:#163327;--bad:#f08a7e;--bad-soft:#3d1d1a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e161d;--surface:#15212b;--ink:#e7eef3;--muted:#9db0bf;--line:#253542;--accent:#5cc3df;--accent-soft:#16323d;--warn-soft:#3a2d12;--ok:#5fd39a;--ok-soft:#163327;--bad:#f08a7e;--bad-soft:#3d1d1a;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.6}
+a{color:var(--accent);text-underline-offset:3px}
+.doc{max-width:1040px;margin:0 auto;padding:36px 20px 64px;display:grid;gap:28px}
+h1,h2{font-family:var(--display);line-height:1.25;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.5rem,3.2vw,2rem)}
+h2{font-size:1.2rem;padding-top:8px;border-top:1px solid var(--line)}
+p,ul{margin:0}
+ul{padding-left:20px;display:grid;gap:4px}
+.label{font-family:var(--mono);font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.notice{background:var(--warn-soft);border-radius:6px;padding:6px 10px;font-size:.88rem}
+section{display:grid;gap:12px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.tile{padding:14px 16px;border-right:1px solid var(--line);display:grid;gap:2px}
+.tile:last-child{border-right:0}
+.tile b{font-family:var(--display);font-size:1.4rem;font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.id{font-family:var(--mono);font-size:.8rem;white-space:nowrap;color:var(--accent)}
+.pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.75rem;font-weight:600;white-space:nowrap}
+.pass{background:var(--ok-soft);color:var(--ok)}.fail{background:var(--bad-soft);color:var(--bad)}
+.crit{font-family:var(--mono);font-size:.78rem;white-space:nowrap}
+footer{color:var(--muted);font-size:.88rem;border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:640px){.tiles{grid-template-columns:1fr 1fr}.tile{border-bottom:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<article class="doc">
+  <header style="display:grid;gap:10px">
+    <p class="label"><a href="../">← artuphay.github.io</a> · Work sample · Test plan</p>
+    <h1>UAT Plan: Water Bill Payment with PDAM Tirta Contoh</h1>
+    <p class="notice">Sample document. Results below are an illustrative run, not real test data. Requirement IDs refer to the <a href="prd.html">PRD</a>; the flows can be tried in the <a href="../simulator/">simulator</a>.</p>
+  </header>
+
+  <section>
+    <h2>Summary of UAT cycle 1</h2>
+    <div class="tiles">
+      <div class="tile"><span class="label">Test cases</span><b>20</b></div>
+      <div class="tile"><span class="label">Passed</span><b>18</b></div>
+      <div class="tile"><span class="label">Failed, fixed, retest</span><b>2</b></div>
+      <div class="tile"><span class="label">Open critical defects</span><b>0</b></div>
+    </div>
+    <p>Environment: biller staging host and our UAT switch, teller app build 4.12, mobile app build 2.8. Testers: Operations (2 tellers, 1 supervisor), Finance settlement, Partnership. Duration: 5 working days.</p>
+  </section>
+
+  <section>
+    <h2>A. Inquiry</h2>
+    <div class="tablewrap"><table><thead><tr><th>ID</th><th>Scenario</th><th>Steps / data</th><th>Expected result</th><th>Ref</th><th>Sev.</th><th>Result</th></tr></thead><tbody>
+      <tr><td class="id">UAT-01</td><td>Valid customer with one open bill</td><td>Inquiry ID 0100234567</td><td>rc 00; name, period, amount and Rp2,500 fee shown</td><td>FR-01, FR-03</td><td class="crit">Critical</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-02</td><td>Customer ID not registered</td><td>Inquiry ID 9999999999</td><td>rc 14; message "Customer ID not found"; Pay disabled</td><td>FR-01</td><td class="crit">High</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-03</td><td>Bill already paid</td><td>Inquiry ID 0100234569</td><td>rc 88; message "Already paid"; no payment possible</td><td>FR-01</td><td class="crit">High</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-04</td><td>Customer with 3 open periods</td><td>Inquiry ID with arrears</td><td>All periods listed with subtotal; total = sum of periods + one fee</td><td>FR-08</td><td class="crit">Medium</td><td><span class="pill fail">Fail → Pass</span></td></tr>
+      <tr><td class="id">UAT-05</td><td>Amount cannot be edited</td><td>Try to change amount field on teller app</td><td>Field is read-only</td><td>FR-02</td><td class="crit">Critical</td><td><span class="pill pass">Pass</span></td></tr>
+    </tbody></table></div>
+    <p>UAT-04 defect: the fee was charged per period instead of per transaction. Fixed in build 4.13 and retested.</p>
+  </section>
+
+  <section>
+    <h2>B. Payment, advice and reversal</h2>
+    <div class="tablewrap"><table><thead><tr><th>ID</th><th>Scenario</th><th>Steps / data</th><th>Expected result</th><th>Ref</th><th>Sev.</th><th>Result</th></tr></thead><tbody>
+      <tr><td class="id">UAT-06</td><td>Successful payment at counter</td><td>Inquiry then pay, cash</td><td>rc 00; receipt with biller reference; bill shows paid on re-inquiry</td><td>FR-07</td><td class="crit">Critical</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-07</td><td>Successful payment in mobile app</td><td>Inquiry then pay from balance</td><td>rc 00; e-receipt; balance debited once</td><td>FR-07</td><td class="crit">Critical</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-08</td><td>Biller timeout, payment posted at biller</td><td>Biller delays response 45 s</td><td>Status "processing"; advice returns paid; one receipt; one debit</td><td>FR-05</td><td class="crit">Critical</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-09</td><td>Biller timeout, payment not posted</td><td>Biller drops request</td><td>3 advices return not found; transaction failed; customer refunded</td><td>FR-05</td><td class="crit">Critical</td><td><span class="pill fail">Fail → Pass</span></td></tr>
+      <tr><td class="id">UAT-10</td><td>Teller tries to pay twice</td><td>Press Pay again while processing</td><td>Second request blocked; no duplicate transaction ID sent</td><td>FR-04</td><td class="crit">Critical</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-11</td><td>Duplicate transaction ID</td><td>Replay payment message with same ID</td><td>Biller returns rc 94; no second posting</td><td>FR-04</td><td class="crit">High</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-12</td><td>Same-day reversal with approval</td><td>Supervisor approves reversal at 15:00</td><td>rc 00; bill reopens on re-inquiry; refund receipt printed</td><td>FR-06</td><td class="crit">High</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-13</td><td>Reversal after cut-off</td><td>Attempt reversal at 23:10</td><td>Blocked with message to raise a refund ticket</td><td>FR-06</td><td class="crit">Medium</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-14</td><td>Response time</td><td>100 inquiries + 100 payments</td><td>95th percentile ≤ 5 s</td><td>NFR-02</td><td class="crit">High</td><td><span class="pill pass">Pass</span></td></tr>
+    </tbody></table></div>
+    <p>UAT-09 defect: after the third advice the transaction stayed "processing" instead of failing. Fixed in switch config and retested.</p>
+  </section>
+
+  <section>
+    <h2>C. Settlement and reconciliation</h2>
+    <div class="tablewrap"><table><thead><tr><th>ID</th><th>Scenario</th><th>Steps / data</th><th>Expected result</th><th>Ref</th><th>Sev.</th><th>Result</th></tr></thead><tbody>
+      <tr><td class="id">UAT-15</td><td>Clean day</td><td>Settlement file matches all transactions</td><td>100% match; transfer instruction generated for H+1</td><td>PRD §7</td><td class="crit">Critical</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-16</td><td>Transaction missing at biller</td><td>Remove one success row from file</td><td>Flagged "missing at biller"; amount held from transfer</td><td>PRD §7</td><td class="crit">Critical</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-17</td><td>Amount mismatch</td><td>Change one amount in file</td><td>Flagged "amount mismatch"; routed to Finance and Partnership</td><td>PRD §7</td><td class="crit">Critical</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-18</td><td>Record not in our system</td><td>Add unknown transaction ID to file</td><td>Flagged "not in our records"; excluded from transfer</td><td>PRD §7</td><td class="crit">High</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-19</td><td>Late settlement file</td><td>File arrives 06:00</td><td>Alert to Partnership at 03:00; recon runs on arrival</td><td>PRD §7</td><td class="crit">Medium</td><td><span class="pill pass">Pass</span></td></tr>
+      <tr><td class="id">UAT-20</td><td>Monthly fee invoice</td><td>Run invoice for test month</td><td>Invoice counts matched transactions only; totals equal recon report</td><td>PRD §7</td><td class="crit">High</td><td><span class="pill pass">Pass</span></td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section>
+    <h2>Exit criteria</h2>
+    <ul>
+      <li>All Critical and High test cases passed; no open Critical or High defects.</li>
+      <li>Medium defects have an agreed fix date before full launch.</li>
+      <li>Two consecutive reconciliation dry runs with 100% match.</li>
+      <li>Teller briefing material approved by Operations.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Sign-off</h2>
+    <div class="tablewrap"><table><thead><tr><th>Function</th><th>Role</th><th>Decision</th></tr></thead><tbody>
+      <tr><td>Partnership</td><td>Biller Partnership Manager</td><td>Approve for pilot</td></tr>
+      <tr><td>Operations</td><td>Counter Operations Lead</td><td>Approve for pilot</td></tr>
+      <tr><td>Finance</td><td>Settlement Lead</td><td>Approve for pilot</td></tr>
+      <tr><td>Engineering</td><td>Payment Switch Lead</td><td>Approve for pilot</td></tr>
+      <tr><td>Biller</td><td>PDAM Tirta Contoh IT Head</td><td>Approve for pilot</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <footer>Prepared by Muhammad Ari Syahputra Sandan as a portfolio work sample. <a href="../">Back to portfolio</a></footer>
+</article>
+</body>
+</html>

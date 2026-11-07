@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biller Integration Simulator</title>
+<meta name="description" content="Interactive simulator of a host-to-host bill payment integration: inquiry, payment, advice, reversal and daily reconciliation. Fictional data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: control panel left, live API exchange right; KPI strip, transaction ledger, then reconciliation workbench. */
+:root{
+  --bg:#f5f7f8; --surface:#ffffff; --ink:#14202b; --muted:#556270; --line:#dbe2e7;
+  --accent:#0b6e8a; --accent-soft:#e3f1f5;
+  --ok:#1f7a4d; --ok-soft:#e2f3ea; --warn:#9a6200; --warn-soft:#fbf0db; --bad:#b03a2e; --bad-soft:#f8e4e1;
+  --code-bg:#0f1b24; --code-ink:#d6e4ee;
+  --display:"Sora","Segoe UI",system-ui,sans-serif; --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e161d; --surface:#15212b; --ink:#e7eef3; --muted:#9db0bf; --line:#253542; --accent:#5cc3df; --accent-soft:#16323d;
+  --ok:#5fd39a; --ok-soft:#163327; --warn:#f0b955; --warn-soft:#3a2d12; --bad:#f08a7e; --bad-soft:#3d1d1a; --code-bg:#091117; --code-ink:#cfe0ea; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e161d; --surface:#15212b; --ink:#e7eef3; --muted:#9db0bf; --line:#253542; --accent:#5cc3df; --accent-soft:#16323d;
+  --ok:#5fd39a; --ok-soft:#163327; --warn:#f0b955; --warn-soft:#3a2d12; --bad:#f08a7e; --bad-soft:#3d1d1a; --code-bg:#091117; --code-ink:#cfe0ea; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+a{color:var(--accent);text-underline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+h1,h2,h3{font-family:var(--display);line-height:1.2;margin:0;text-wrap:balance}
+h1{font-size:clamp(1.6rem,3.4vw,2.2rem)}
+h2{font-size:1.25rem}
+h3{font-size:1rem}
+p{margin:0}
+.label{font-family:var(--mono);font-size:.74rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+header{padding:36px 0 24px;border-bottom:1px solid var(--line)}
+.head{display:grid;gap:10px;max-width:820px}
+.head p.lede{color:var(--muted)}
+.notice{display:inline-block;background:var(--warn-soft);color:var(--ink);border-radius:6px;padding:4px 10px;font-size:.85rem}
+section{padding:28px 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;margin-bottom:16px}
+.sec-head div{display:grid;gap:4px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.grid2{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:16px}
+.panel{padding:18px;display:grid;gap:14px;align-content:start}
+.field{display:grid;gap:6px}
+label{font-size:.88rem;font-weight:500}
+select,input[type=text]{font:inherit;font-size:.95rem;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%}
+select:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{font-size:.82rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:3px 10px;cursor:pointer}
+.chip:hover{border-color:var(--accent)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+button{font:inherit;font-size:.92rem;font-weight:500;border-radius:6px;padding:9px 14px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:#fff}
+:root[data-theme="dark"] button.primary, button.primary{color:var(--bg)}
+button.ghost{background:transparent;color:var(--accent)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.check{display:flex;gap:8px;align-items:center;font-size:.9rem}
+.bill{border:1px dashed var(--line);border-radius:8px;padding:12px;display:grid;gap:4px;font-size:.92rem}
+.bill .row{display:flex;justify-content:space-between;gap:12px}
+.bill .row b{font-variant-numeric:tabular-nums}
+.console{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:14px;font-family:var(--mono);font-size:.8rem;line-height:1.5;min-height:420px;max-height:560px;overflow:auto}
+.ex{border-bottom:1px solid #22323e;padding:8px 0}
+.ex:last-child{border-bottom:0}
+.ex .dir{color:#7fb8cc}
+.ex .rc{font-weight:500}
+.rc-00{color:#6fdca2}.rc-14,.rc-05,.rc-94{color:#f19b90}.rc-68{color:#f2c46b}.rc-88{color:#f2c46b}
+pre{margin:4px 0 0;white-space:pre-wrap;word-break:break-word}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:0;overflow:hidden}
+.kpi{padding:14px 16px;border-right:1px solid var(--line);display:grid;gap:2px}
+.kpi:last-child{border-right:0}
+.kpi .num{font-family:var(--display);font-size:1.4rem;font-weight:700;font-variant-numeric:tabular-nums}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+td.wrap-cell{white-space:normal;min-width:260px}
+.sec-head .btns{flex-wrap:wrap;justify-content:flex-end}
+th.num{text-align:right}
+tbody tr:last-child td{border-bottom:0}
+.pill{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.76rem;font-weight:600}
+.p-ok{background:var(--ok-soft);color:var(--ok)}.p-warn{background:var(--warn-soft);color:var(--warn)}.p-bad{background:var(--bad-soft);color:var(--bad)}.p-neutral{background:var(--accent-soft);color:var(--accent)}
+.recon-sum{display:grid;grid-template-columns:repeat(5,1fr);gap:0}
+.steps{display:grid;gap:10px;padding:18px}
+.steps ol{margin:0;padding-left:20px;display:grid;gap:6px;font-size:.92rem}
+textarea{width:100%;min-height:150px;font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);padding:10px}
+.codes{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.codes div{border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:.88rem;background:var(--surface)}
+.codes b{font-family:var(--mono)}
+footer{padding:28px 0 48px;color:var(--muted);font-size:.88rem}
+.stack{display:grid;gap:16px}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}.kpis,.recon-sum{grid-template-columns:repeat(2,1fr)}.kpi{border-bottom:1px solid var(--line)}.console{min-height:260px}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap head">
+    <p class="label"><a href="../">← artuphay.github.io</a> · Work sample</p>
+    <h1>Biller Integration Simulator</h1>
+    <p class="lede">A working model of the host-to-host bill payment flow I manage with billers: inquiry, payment, advice and reversal, followed by the end-of-day reconciliation that catches disputes before they reach Finance. Pick a biller, enter a customer ID and watch every request and response.</p>
+    <span class="notice">All billers, customers and amounts here are fictional. No partner data is used.</span>
+  </div>
+</header>
+
+<main>
+<section>
+  <div class="wrap">
+    <div class="sec-head"><div><p class="label">Step 1 · Transaction flow</p><h2>Run a payment</h2></div></div>
+    <div class="grid2">
+      <div class="card panel">
+        <div class="field">
+          <label for="biller">Biller</label>
+          <select id="biller"></select>
+        </div>
+        <div class="field">
+          <label for="custid">Customer ID</label>
+          <input type="text" id="custid" autocomplete="off" inputmode="numeric">
+          <div class="hint">Try a test ID:</div>
+          <div class="chips" id="testids"></div>
+        </div>
+        <div class="btns">
+          <button class="primary" id="btnInquiry" type="button">Inquiry</button>
+          <button class="ghost" id="btnReset" type="button">Reset flow</button>
+        </div>
+        <div id="billBox" hidden></div>
+        <label class="check"><input type="checkbox" id="simTimeout"> Simulate biller timeout on payment</label>
+        <div class="btns">
+          <button class="primary" id="btnPay" type="button" disabled>Pay</button>
+          <button class="ghost" id="btnAdvice" type="button" disabled>Send advice</button>
+          <button class="ghost" id="btnReversal" type="button" disabled>Send reversal</button>
+        </div>
+        <p class="hint" id="flowHint">Start with an inquiry to fetch the bill.</p>
+      </div>
+      <div>
+        <div class="sec-head" style="margin-bottom:8px"><div><p class="label">Live API exchange</p></div><button class="ghost" id="btnClearLog" type="button">Clear</button></div>
+        <div class="console" id="console" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <div class="sec-head"><div><p class="label">Step 2 · Monitoring</p><h2>Today's transactions</h2></div>
+      <div class="btns"><button class="ghost" id="btnSeed" type="button">Add 10 random transactions</button><button class="ghost" id="btnClearTrx" type="button">Start empty</button></div></div>
+    <div class="card kpis" id="kpis"></div>
+    <div class="card tablewrap"><table id="trxTable"><thead><tr><th>Trx ID</th><th>Time</th><th>Biller</th><th>Customer</th><th class="num">Bill</th><th class="num">Fee</th><th class="num">Total</th><th>Status</th><th>Biller ref</th></tr></thead><tbody></tbody></table></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <div class="sec-head"><div><p class="label">Step 3 · End of day</p><h2>Reconciliation workbench</h2></div>
+      <div class="btns"><button class="primary" id="btnSettle" type="button">Receive biller settlement file</button><button class="primary" id="btnRecon" type="button" disabled>Run reconciliation</button></div></div>
+    <p class="hint">The biller sends its own record of the day. Matching it against ours, by transaction ID, amount and status, surfaces every case that would otherwise become a billing dispute. The settlement file here contains a few typical errors on purpose.</p>
+    <div class="card recon-sum kpis" id="reconSum"></div>
+    <div class="card tablewrap"><table id="reconTable"><thead><tr><th>Trx ID</th><th>Exception</th><th class="num">Our amount</th><th class="num">Biller amount</th><th>Our status</th><th>Biller status</th><th>Next action</th></tr></thead><tbody><tr><td colspan="7" class="hint">Receive the settlement file, then run reconciliation.</td></tr></tbody></table></div>
+    <div class="field"><label for="settleFile">Biller settlement file (CSV)</label><textarea id="settleFile" readonly placeholder="The file appears here after you receive it."></textarea></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap stack">
+    <div class="sec-head"><div><p class="label">Reference</p><h2>Response codes used</h2></div></div>
+    <div class="codes">
+      <div><b>00</b> Approved. Inquiry found a bill, or payment posted.</div>
+      <div><b>14</b> Customer ID not found at the biller.</div>
+      <div><b>88</b> Bill already paid for this period.</div>
+      <div><b>68</b> Timeout / pending. Send an advice to learn the final status.</div>
+      <div><b>94</b> Duplicate transaction ID.</div>
+      <div><b>05</b> Rejected, for example a reversal on a transaction the biller has not posted.</div>
+    </div>
+    <div class="card steps">
+      <h3>What this demonstrates</h3>
+      <ol>
+        <li>Why inquiry comes before payment: the amount is locked by the biller, not typed by the teller.</li>
+        <li>How a timeout is resolved safely with an advice instead of a second payment, which would charge the customer twice.</li>
+        <li>When a reversal is the right call, and why the biller may reject it.</li>
+        <li>The four exception types that cause most billing disputes, and who acts on each one.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer><div class="wrap">Built by Muhammad Ari Syahputra Sandan as a portfolio work sample · plain HTML and JavaScript, runs entirely in your browser · <a href="../">Back to portfolio</a></div></footer>
+
+<script>
+(function(){
+'use strict';
+// ---------- Fictional reference data ----------
+const BILLERS = [
+  {code:'400101', name:'PDAM Tirta Contoh', type:'Water utility', fee:2500},
+  {code:'500201', name:'Pajak Daerah Kota Contoh (PBB)', type:'Regional tax', fee:3000},
+  {code:'600301', name:'Asuransi Mikro Contoh', type:'Microinsurance premium', fee:2000},
+  {code:'700401', name:'Data Seluler Contoh', type:'Mobile data top-up', fee:1500}
+];
+const CUSTOMERS = {
+  '400101': {
+    '0100234567': {name:'SITI AMINAH', period:'OKT 2026', amount:87500},
+    '0100234568': {name:'BUDI SANTOSO', period:'OKT 2026', amount:154200},
+    '0100234569': {name:'RINA KARTIKA', period:'OKT 2026', amount:63000, paid:true}
+  },
+  '500201': {
+    '3271010001': {name:'H. AHMAD FAUZI', period:'TAHUN 2026', amount:412000},
+    '3271010002': {name:'DEWI LESTARI', period:'TAHUN 2026', amount:268500}
+  },
+  '600301': {
+    '8801200301': {name:'YUSUF HIDAYAT', period:'NOV 2026', amount:25000},
+    '8801200302': {name:'NUR HASANAH', period:'NOV 2026', amount:50000}
+  },
+  '700401': {
+    '081200000111': {name:'PAKET 10GB 30 HARI', period:'-', amount:55000},
+    '081200000222': {name:'PAKET 25GB 30 HARI', period:'-', amount:98000}
+  }
+};
+const STATUS = {SUCCESS:'Success', PENDING:'Pending', REVERSED:'Reversed', FAILED:'Failed'};
+
+// ---------- State ----------
+let trxs = [];
+let seq = 1;
+let flow = null;            // {biller, custId, bill, inquiryRef, trx}
+let billerLedger = {};      // what the biller has actually posted: trxId -> {amount,status}
+let settlement = null;      // parsed settlement rows
+
+const $ = id => document.getElementById(id);
+const rupiah = n => 'Rp' + Math.round(n).toLocaleString('id-ID');
+const pad = (n,w) => String(n).padStart(w,'0');
+const nowTime = () => { const d=new Date(); return pad(d.getHours(),2)+':'+pad(d.getMinutes(),2)+':'+pad(d.getSeconds(),2); };
+const newTrxId = () => 'POS' + new Date().toISOString().slice(2,10).replace(/-/g,'') + pad(seq++,5);
+const newRef = () => 'BLR' + Math.floor(100000000 + Math.random()*899999999);
+const billerByCode = c => BILLERS.find(b=>b.code===c);
+
+// ---------- Mock biller host ----------
+const host = {
+  inquiry(req){
+    const cust = (CUSTOMERS[req.biller_code]||{})[req.customer_id];
+    if(!cust) return {rc:'14', message:'CUSTOMER ID NOT FOUND'};
+    if(cust.paid) return {rc:'88', message:'BILL ALREADY PAID'};
+    return {rc:'00', message:'APPROVED', customer_name:cust.name, period:cust.period, bill_amount:cust.amount, inquiry_ref:newRef()};
+  },
+  payment(req, simulateTimeout){
+    if(billerLedger[req.trx_id]) return {rc:'94', message:'DUPLICATE TRANSACTION'};
+    // Biller posts the payment even when its response is lost on the way back.
+    billerLedger[req.trx_id] = {amount:req.bill_amount, status:'PAID', ref:newRef()};
+    const cust = (CUSTOMERS[req.biller_code]||{})[req.customer_id];
+    if(cust) cust.paid = true;
+    if(simulateTimeout) return null;
+    return {rc:'00', message:'PAYMENT POSTED', biller_ref:billerLedger[req.trx_id].ref};
+  },
+  advice(req){
+    const rec = billerLedger[req.trx_id];
+    if(!rec) return {rc:'14', message:'TRANSACTION NOT FOUND'};
+    return {rc:'00', message:'TRANSACTION STATUS: '+rec.status, biller_ref:rec.ref, status:rec.status};
+  },
+  reversal(req){
+    const rec = billerLedger[req.trx_id];
+    if(!rec) return {rc:'05', message:'NOTHING TO REVERSE'};
+    if(rec.status==='REVERSED') return {rc:'94', message:'ALREADY REVERSED'};
+    rec.status='REVERSED';
+    return {rc:'00', message:'REVERSAL APPROVED', biller_ref:rec.ref};
+  }
+};
+
+// ---------- Console ----------
+function logExchange(step, req, res){
+  const box = $('console');
+  const el = document.createElement('div');
+  el.className='ex';
+  const rc = res ? res.rc : '68';
+  const resText = res ? JSON.stringify(res,null,2) : '// no response from biller within 30 s → treat as PENDING (rc 68)';
+  el.innerHTML = '<div><span class="dir">'+nowTime()+' → '+step.toUpperCase()+' REQUEST</span></div><pre></pre>'+
+                 '<div><span class="dir">← RESPONSE</span> <span class="rc rc-'+rc+'">rc '+rc+'</span></div><pre></pre>';
+  const pres = el.querySelectorAll('pre');
+  pres[0].textContent = JSON.stringify(req,null,2);
+  pres[1].textContent = resText;
+  box.prepend(el);
+}
+
+// ---------- Transactions ----------
+function addTrx(t){ trxs.unshift(t); renderTrx(); }
+function updateTrx(){ renderTrx(); }
+function statusPill(s){
+  const cls = s===STATUS.SUCCESS?'p-ok':s===STATUS.PENDING?'p-warn':s===STATUS.REVERSED?'p-neutral':'p-bad';
+  return '<span class="pill '+cls+'">'+s+'</span>';
+}
+function renderTrx(){
+  const tb = $('trxTable').querySelector('tbody');
+  if(!trxs.length){ tb.innerHTML='<tr><td colspan="9" class="hint">No transactions yet. Run a payment above or add random ones.</td></tr>'; }
+  else tb.innerHTML = trxs.map(t=>'<tr><td>'+t.id+'</td><td>'+t.time+'</td><td>'+esc(billerByCode(t.biller).name)+'</td><td>'+t.cust+'</td><td class="num">'+rupiah(t.amount)+'</td><td class="num">'+rupiah(t.fee)+'</td><td class="num">'+rupiah(t.amount+t.fee)+'</td><td>'+statusPill(t.status)+'</td><td>'+(t.ref||'—')+'</td></tr>').join('');
+  const ok = trxs.filter(t=>t.status===STATUS.SUCCESS);
+  const pend = trxs.filter(t=>t.status===STATUS.PENDING).length;
+  const vol = ok.reduce((s,t)=>s+t.amount,0);
+  const fees = ok.reduce((s,t)=>s+t.fee,0);
+  const rate = trxs.length ? Math.round(ok.length/trxs.length*100) : 0;
+  $('kpis').innerHTML = kpi('Transactions', trxs.length) + kpi('Success rate', rate+'%') + kpi('Bill volume posted', rupiah(vol)) + kpi('Fee income', rupiah(fees)) + kpi('Pending (needs advice)', pend);
+  $('btnRecon').disabled = !settlement;
+}
+const kpi = (l,v) => '<div class="kpi"><span class="label">'+l+'</span><span class="num">'+v+'</span></div>';
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+// ---------- Flow controls ----------
+function setButtons(state){
+  $('btnPay').disabled = state!=='inquired';
+  $('btnAdvice').disabled = state!=='pending';
+  $('btnReversal').disabled = !(state==='pending' || state==='paid');
+  const hints = {
+    idle:'Start with an inquiry to fetch the bill.',
+    inquired:'Bill locked by the biller. Tick the timeout box to see how a lost response is handled, then pay.',
+    pending:'No response from the biller. Do not pay again: send an advice to learn the final status, or a reversal to cancel.',
+    paid:'Payment posted. A reversal is still possible today if the teller made a mistake.',
+    done:'Flow finished. Reset to run another payment.'
+  };
+  $('flowHint').textContent = hints[state];
+}
+function renderBill(){
+  const b = flow && flow.bill;
+  if(!b){ $('billBox').hidden=true; return; }
+  const biller = billerByCode(flow.biller);
+  $('billBox').hidden=false;
+  $('billBox').className='bill';
+  $('billBox').innerHTML = '<div class="row"><span>Name</span><b>'+esc(b.customer_name)+'</b></div><div class="row"><span>Period</span><b>'+esc(b.period)+'</b></div><div class="row"><span>Bill</span><b>'+rupiah(b.bill_amount)+'</b></div><div class="row"><span>Admin fee</span><b>'+rupiah(biller.fee)+'</b></div><div class="row"><span>Customer pays</span><b>'+rupiah(b.bill_amount+biller.fee)+'</b></div>';
+}
+function doInquiry(){
+  const code = $('biller').value, cust = $('custid').value.trim();
+  const req = {mti:'INQUIRY', biller_code:code, customer_id:cust, channel:'POS_COUNTER', timestamp:new Date().toISOString()};
+  const res = host.inquiry(req);
+  logExchange('inquiry', req, res);
+  if(res.rc==='00'){ flow = {biller:code, custId:cust, bill:res}; renderBill(); setButtons('inquired'); }
+  else { flow=null; renderBill(); setButtons('idle'); $('flowHint').textContent = res.rc==='88' ? 'rc 88: this bill is already paid. Nothing to collect.' : 'rc 14: check the customer ID with the customer.'; }
+}
+function doPay(){
+  const biller = billerByCode(flow.biller);
+  const trx = {id:newTrxId(), time:nowTime(), biller:flow.biller, cust:flow.custId, amount:flow.bill.bill_amount, fee:biller.fee, status:STATUS.PENDING, ref:null};
+  const req = {mti:'PAYMENT', trx_id:trx.id, biller_code:flow.biller, customer_id:flow.custId, inquiry_ref:flow.bill.inquiry_ref, bill_amount:trx.amount, timestamp:new Date().toISOString()};
+  const res = host.payment(req, $('simTimeout').checked);
+  logExchange('payment', req, res);
+  flow.trx = trx;
+  if(res && res.rc==='00'){ trx.status=STATUS.SUCCESS; trx.ref=res.biller_ref; setButtons('paid'); }
+  else if(!res){ trx.status=STATUS.PENDING; setButtons('pending'); }
+  else { trx.status=STATUS.FAILED; setButtons('done'); }
+  addTrx(trx);
+}
+function doAdvice(){
+  const req = {mti:'ADVICE', trx_id:flow.trx.id, biller_code:flow.biller, timestamp:new Date().toISOString()};
+  const res = host.advice(req);
+  logExchange('advice', req, res);
+  if(res.rc==='00' && res.status==='PAID'){ flow.trx.status=STATUS.SUCCESS; flow.trx.ref=res.biller_ref; setButtons('paid'); $('flowHint').textContent='Advice confirms the biller posted it. Marked Success; no double charge.'; }
+  else { flow.trx.status=STATUS.FAILED; setButtons('done'); }
+  updateTrx();
+}
+function doReversal(){
+  const req = {mti:'REVERSAL', trx_id:flow.trx.id, biller_code:flow.biller, timestamp:new Date().toISOString()};
+  const res = host.reversal(req);
+  logExchange('reversal', req, res);
+  if(res.rc==='00'){ flow.trx.status=STATUS.REVERSED; flow.trx.ref=res.biller_ref; const c=CUSTOMERS[flow.biller][flow.custId]; if(c) c.paid=false; }
+  setButtons('done'); updateTrx();
+}
+function resetFlow(){ flow=null; renderBill(); setButtons('idle'); $('simTimeout').checked=false; }
+
+// ---------- Random demo transactions ----------
+function seedRandom(n){
+  for(let i=0;i<n;i++){
+    const b = BILLERS[Math.floor(Math.random()*BILLERS.length)];
+    const amount = b.code==='700401' ? [25000,55000,98000][i%3] : Math.round((30000+Math.random()*420000)/100)*100;
+    const id = newTrxId();
+    const r = Math.random();
+    let status = STATUS.SUCCESS;
+    if(r>0.9) status=STATUS.PENDING; else if(r>0.85) status=STATUS.FAILED;
+    const t = {id, time:nowTime(), biller:b.code, cust:String(Math.floor(1e9+Math.random()*8e9)), amount, fee:b.fee, status, ref:null};
+    if(status!==STATUS.FAILED){ billerLedger[id]={amount, status:'PAID', ref:newRef()}; }
+    if(status===STATUS.SUCCESS) t.ref = billerLedger[id].ref;
+    trxs.unshift(t);
+  }
+  renderTrx();
+}
+
+// ---------- Settlement and reconciliation ----------
+// Builds the biller's file from what the biller actually posted, then injects typical errors.
+function buildSettlement(){
+  const rows = Object.entries(billerLedger).filter(([,r])=>r.status!=='REVERSED').map(([id,r])=>({trx_id:id, amount:r.amount, status:'PAID', biller_ref:r.ref}));
+  const ourOk = trxs.filter(t=>t.status===STATUS.SUCCESS).map(t=>t.id);
+  const injected = [];
+  // 1. Biller dropped one of our successful transactions.
+  const dropId = ourOk.find(id=>rows.some(r=>r.trx_id===id));
+  if(dropId){ rows.splice(rows.findIndex(r=>r.trx_id===dropId),1); injected.push('missing'); }
+  // 2. Amount mismatch on another one (biller posted a different amount).
+  const mm = rows.find(r=>ourOk.includes(r.trx_id) && r.trx_id!==dropId);
+  if(mm){ mm.amount += 1000; injected.push('amount'); }
+  // 3. A record the biller has that we never sent (wrong channel or test trx in production).
+  rows.push({trx_id:'POS'+new Date().toISOString().slice(2,10).replace(/-/g,'')+'9'+pad(Math.floor(Math.random()*9999),4), amount:120000, status:'PAID', biller_ref:newRef()});
+  rows.sort((a,b)=>a.trx_id.localeCompare(b.trx_id));
+  return rows;
+}
+function toCSV(rows){ return 'trx_id,amount,status,biller_ref\n' + rows.map(r=>[r.trx_id,r.amount,r.status,r.biller_ref].join(',')).join('\n'); }
+
+function reconcile(ours, theirs){
+  const byId = new Map(theirs.map(r=>[r.trx_id,r]));
+  const seen = new Set();
+  const out = {matched:0, exceptions:[]};
+  for(const t of ours){
+    const b = byId.get(t.id); if(b) seen.add(t.id);
+    const ourCounts = t.status===STATUS.SUCCESS || t.status===STATUS.PENDING;
+    if(!b){
+      if(t.status===STATUS.SUCCESS) out.exceptions.push({id:t.id, type:'Missing at biller', our:t.amount, their:null, os:t.status, bs:'—', action:'Send advice with proof of posting; escalate to biller ops if still missing'});
+      else if(t.status===STATUS.PENDING) out.exceptions.push({id:t.id, type:'Pending, not posted', our:t.amount, their:null, os:t.status, bs:'—', action:'Mark failed and refund the customer the same day'});
+      continue;
+    }
+    if(t.status===STATUS.PENDING){ out.exceptions.push({id:t.id, type:'Status mismatch', our:t.amount, their:b.amount, os:t.status, bs:b.status, action:'Biller posted it: update to Success, no refund'}); continue; }
+    if(!ourCounts){ out.exceptions.push({id:t.id, type:'Status mismatch', our:t.amount, their:b.amount, os:t.status, bs:b.status, action:'Request reversal from biller or settle and credit customer'}); continue; }
+    if(b.amount!==t.amount){ out.exceptions.push({id:t.id, type:'Amount mismatch', our:t.amount, their:b.amount, os:t.status, bs:b.status, action:'Check inquiry log and fee config; agree correction with biller'}); continue; }
+    out.matched++;
+  }
+  for(const b of theirs){ if(!seen.has(b.trx_id)) out.exceptions.push({id:b.trx_id, type:'Not in our records', our:null, their:b.amount, os:'—', bs:b.status, action:'Reject from settlement; ask biller for channel trace'}); }
+  return out;
+}
+window.__reconcile = reconcile; // exposed for testing
+
+function renderRecon(r){
+  const total = r.matched + r.exceptions.length;
+  const exAmt = r.exceptions.reduce((s,e)=>s+Math.abs((e.our||0)-(e.their||0)) ,0);
+  const rate = total ? (r.matched/total*100).toFixed(1) : '0.0';
+  $('reconSum').innerHTML = kpi('Records compared', total) + kpi('Matched', r.matched) + kpi('Exceptions', r.exceptions.length) + kpi('Match rate', rate+'%') + kpi('Value at risk', rupiah(exAmt));
+  const tb = $('reconTable').querySelector('tbody');
+  if(!r.exceptions.length){ tb.innerHTML='<tr><td colspan="7"><span class="pill p-ok">Clean</span> Every record matches. Settlement can be approved.</td></tr>'; return; }
+  const cls = t => t==='Amount mismatch'||t==='Missing at biller'?'p-bad':t==='Not in our records'?'p-bad':'p-warn';
+  tb.innerHTML = r.exceptions.map(e=>'<tr><td>'+e.id+'</td><td><span class="pill '+cls(e.type)+'">'+e.type+'</span></td><td class="num">'+(e.our==null?'—':rupiah(e.our))+'</td><td class="num">'+(e.their==null?'—':rupiah(e.their))+'</td><td>'+e.os+'</td><td>'+e.bs+'</td><td class="wrap-cell">'+esc(e.action)+'</td></tr>').join('');
+}
+
+// ---------- Wire up ----------
+function init(){
+  $('biller').innerHTML = BILLERS.map(b=>'<option value="'+b.code+'">'+esc(b.name)+' · '+b.type+'</option>').join('');
+  const renderIds = () => {
+    const code = $('biller').value;
+    const ids = Object.keys(CUSTOMERS[code]).concat(['9999999999']);
+    $('testids').innerHTML = ids.map(id=>{ const c=CUSTOMERS[code][id]; const tag = !c?'not found':c.paid?'paid':'open'; return '<button type="button" class="chip" data-id="'+id+'">'+id+' · '+tag+'</button>'; }).join('');
+    $('custid').value = ids[0];
+  };
+  $('biller').addEventListener('change', ()=>{ renderIds(); resetFlow(); });
+  $('testids').addEventListener('click', e=>{ const b=e.target.closest('.chip'); if(b){ $('custid').value=b.dataset.id; } });
+  $('btnInquiry').addEventListener('click', ()=>{ doInquiry(); renderIds(); $('custid').value = flow?flow.custId:$('custid').value; });
+  $('btnPay').addEventListener('click', ()=>{ doPay(); renderIds(); $('custid').value=flow.custId; });
+  $('btnAdvice').addEventListener('click', doAdvice);
+  $('btnReversal').addEventListener('click', ()=>{ doReversal(); renderIds(); });
+  $('btnReset').addEventListener('click', resetFlow);
+  $('btnClearLog').addEventListener('click', ()=>{ $('console').innerHTML=''; });
+  $('btnSeed').addEventListener('click', ()=>seedRandom(10));
+  $('btnClearTrx').addEventListener('click', ()=>{ trxs=[]; billerLedger={}; settlement=null; $('settleFile').value=''; renderTrx(); $('reconSum').innerHTML=''; $('reconTable').querySelector('tbody').innerHTML='<tr><td colspan="7" class="hint">Receive the settlement file, then run reconciliation.</td></tr>'; });
+  $('btnSettle').addEventListener('click', ()=>{ if(trxs.length<3) seedRandom(10); settlement = buildSettlement(); $('settleFile').value = toCSV(settlement); $('btnRecon').disabled=false; });
+  $('btnRecon').addEventListener('click', ()=>{ if(settlement) renderRecon(reconcile(trxs, settlement)); });
+  renderIds();
+  setButtons('idle');
+  // Open in a realistic state: a day already in progress and one exchange in the console.
+  seedRandom(12);
+  doInquiry();
+}
+init();
+})();
+</script>
+</body>
+</html>

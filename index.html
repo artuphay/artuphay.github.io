@@ -78,6 +78,16 @@ section{padding:56px 0;border-bottom:1px solid var(--line)}
 .tags{display:flex;flex-wrap:wrap;gap:8px}
 .tag{font-family:var(--mono);font-size:.75rem;border:1px solid var(--line);border-radius:4px;padding:2px 8px;color:var(--muted)}
 
+/* Work samples */
+.samples{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.sample{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:22px;display:grid;gap:10px;align-content:start;text-decoration:none;color:var(--ink)}
+.sample:hover{border-color:var(--accent)}
+.sample:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.sample p{color:var(--muted);font-size:.95rem}
+.sample .go{color:var(--accent);font-weight:500;font-size:.95rem}
+.note{color:var(--muted);font-size:.88rem;margin-top:12px}
+@media (max-width:860px){.samples{grid-template-columns:1fr}}
+
 /* Process */
 .steps{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
 .step{padding:18px 16px;border-right:1px solid var(--line);display:grid;gap:6px;align-content:start}
@@ -235,6 +245,36 @@ footer{padding:40px 0 56px;color:var(--muted);font-size:.9rem}
       </article>
 
     </div>
+  </div>
+</section>
+
+<section id="samples">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="label">Work samples</p>
+      <h2>Try the flow, read the documents</h2>
+    </div>
+    <div class="samples">
+      <a class="sample" href="simulator/">
+        <span class="label">Interactive app</span>
+        <h3>Biller Integration Simulator</h3>
+        <p>Run inquiry, payment, advice and reversal against a mock biller, watch every API message, then reconcile the day against the biller's settlement file.</p>
+        <span class="go">Open simulator →</span>
+      </a>
+      <a class="sample" href="docs/prd.html">
+        <span class="label">Document</span>
+        <h3>PRD: water bill payment integration</h3>
+        <p>Goals and metrics, scope, functional and non-functional requirements, settlement rules, risks and a 10-week plan for onboarding a utility biller.</p>
+        <span class="go">Read PRD →</span>
+      </a>
+      <a class="sample" href="docs/uat.html">
+        <span class="label">Document</span>
+        <h3>UAT plan and results</h3>
+        <p>20 test cases across inquiry, payment, timeout handling and reconciliation, with defects found, exit criteria and sign-off.</p>
+        <span class="go">Read UAT plan →</span>
+      </a>
+    </div>
+    <p class="note">All partners and figures in the work samples are fictional.</p>
   </div>
 </section>
 
